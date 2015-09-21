@@ -8,6 +8,7 @@ import MySQLdb
 import MySQLdb.cursors
 import warnings
 warnings.filterwarnings("ignore")
+from config import *
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -25,8 +26,11 @@ def closedb(db,cursor):
 
 @app.route('/')
 def index():
-	
-	return 'this is index'
+	(db,cursor) = connectdb()
+	cursor.execute("select * from movie limit 100")
+	movies = cursor.fetchall()
+	closedb(db,cursor)
+	return render_template('index.html', movies=movies)
 
 if __name__ == '__main__':
 	app.run(debug=True)

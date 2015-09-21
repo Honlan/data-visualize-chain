@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>豆瓣电影数据可视化</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <link rel="shortcut icon" href="{{url_for('static',filename='img/logo.png')}}">
+    <script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href='http://www.youziku.com/webfont/CSS/5a5eb6e5723496ed8dc0cfd792fd4687' rel='stylesheet' type='text/css' /> {% block style %} {% endblock %}
+    <style>
+    body {
+        font-family: Microsoft Yahei;
+    }
+    
+    #header {
+        background-image: url("{{url_for('static',filename='img/header.png')}}");
+        background-attachment: fixed;
+        background-size: cover;
+        padding: 60px 80px;
+        position: relative;
+        box-shadow: 0px 3px 3px rgba(20, 20, 20, 0.3) inset;
+    }
+    
+    #header #nav {
+        position: absolute;
+        right: 80px;
+        top: 60px;
+    }
+    
+    #header #nav div {
+        display: inline-block;
+        color: white;
+        background-color: transparent;
+        padding: 5px 15px;
+        border: 1px solid white;
+        border-radius: 5px;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: color .3s;
+        -o-transition: color .3s;
+        -ms-transition: color .3s;
+        -moz-transition: color .3s;
+        -webkit-transition: color .3s;
+        transition: background-color .3s;
+        -o-transition: background-color .3s;
+        -ms-transition: background-color .3s;
+        -moz-transition: background-color .3s;
+        -webkit-transition: background-color .3s;
+    }
+    #header #nav a.active div {
+        color: #37a;
+        background-color: white;
+        box-shadow: 2px 2px 3px black;
+    }
+    
+    #header h1 {
+        color: #37a;
+        margin-bottom: 30px;
+        font-family: Helvetica;
+        font-size: 30px;
+    }
+    
+    #header p {
+        color: #555;
+        margin-right: 200px;
+        text-indent: 2em;
+        font-family: Helvetica;
+    }
+    
+    #header p a {
+        text-decoration: none;
+        color: #6FA4CA;
+        margin-left: 2px;
+        margin-right: 2px;
+        transition: color .3s;
+        -o-transition: color .3s;
+        -ms-transition: color .3s;
+        -moz-transition: color .3s;
+        -webkit-transition: color .3s;
+    }
+    
+    #header p a:hover {
+        color: #24597F;
+    }
+    
+    #header p .em {
+        color: #DA6D6D;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <div id="nav">
+            <a href="{{url_for('index')}}" id="nav1"><div>统计</div></a>
+            <a href="" id="nav2"><div>评分</div></a>
+            <a href="" id="nav3"><div>搜索</div></a>
+        </div>
+        <h1>豆瓣电影<span style="font-family:JetLinkMediumOldStamp451548;color:#fff;position:relative;top:-1px;font-size:35px;"><span style="margin-left:10px;margin-right:5px;">数据</span>可视化</span></h1>
+        <p>电影原始数据来自<a href="http://movie.douban.com/" target="_blank">豆瓣电影</a>，使用python的<a href="https://docs.python.org/2/library/urllib2.html" target="_blank">urllib2</a>包<span class="em">爬取</span>数据、<a href="http://www.crummy.com/software/BeautifulSoup/bs4/doc/" target="_blank">BeautifulSoup</a>包完成<span class="em">解析</span>，并且进行数据的<span class="em">预处理</span>和<span class="em">清洗</span>。</p>
+        <p>最终一共获取了<span class="em">4587</span>条电影记录，每条记录包含以下<span class="em">15</span>个字段：电影ID、标题、链接、缩略图、评分、导演、编剧、演员、分类、上映国家、语言、上映时间、时长、别名和简介。</p>
+        <p>在此基础上，使用<a href="http://echarts.baidu.com/" target="_blank">Echarts</a>进行简单的数据可视化，从而完整地展示网络数据<span class="em">采集</span>、<span class="em">存储</span>、<span class="em">处理</span>和<span class="em">使用</span>四个环节所涉及的技术链。</p>
+    </div>
+    <div id="main">
+        {% block body %} {% endblock %}
+    </div>
+</body>
+
+</html>

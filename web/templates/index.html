@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+	
+</style>
+{% endblock %}
+{% block body %}
+<script>
+$(document).ready(function(){
+	$('#header #nav #nav1').addClass('active');
+
+	$('#header #nav a').mouseenter(function(){
+		$('#header #nav a').removeClass('active');
+		$(this).addClass('active');
+	});
+	$('#header #nav').mouseleave(function(){
+		$('#header #nav a').removeClass('active');
+		$('#header #nav #nav1').addClass('active');
+	});
+});
+</script>
+{% for item in movies %}
+<h1>{{item.title}}</h1>
+{% endfor %}
+{% endblock %}
