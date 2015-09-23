@@ -13,10 +13,13 @@
     <script src="http://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
     <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <link href='http://www.youziku.com/webfont/CSS/5a5eb6e5723496ed8dc0cfd792fd4687' rel='stylesheet' type='text/css' /> {% block style %} {% endblock %}
+    <link href='http://www.youziku.com/webfont/CSS/5a5eb6e5723496ed8dc0cfd792fd4687' rel='stylesheet' type='text/css' />
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="{{url_for('static',filename='js/ECharts/echarts.js')}}"></script> {% block style %} {% endblock %}
     <style>
     body {
         font-family: Microsoft Yahei;
+        background-color: #f5f5f5;
     }
     
     #header {
@@ -34,7 +37,8 @@
         top: 60px;
     }
     
-    #header #nav div {
+    #header #nav a {
+        text-decoration: none;
         display: inline-block;
         color: white;
         background-color: transparent;
@@ -54,10 +58,11 @@
         -moz-transition: background-color .3s;
         -webkit-transition: background-color .3s;
     }
-    #header #nav a.active div {
+    
+    #header #nav a.active {
         color: #37a;
         background-color: white;
-        box-shadow: 2px 2px 3px black;
+        box-shadow: 1px 1px 3px rgba(20, 20, 20, 0.6);
     }
     
     #header h1 {
@@ -95,15 +100,62 @@
         margin-left: 2px;
         margin-right: 2px;
     }
+    
+    #footer {
+        text-align: center;
+        color: white;
+        background-color: #333;
+        padding: 30px;
+        font-size: 15px;
+    }
+    
+    #footer p {
+        margin-bottom: 0;
+    }
+    
+    #footer a {
+        text-decoration: none;
+        color: #6FA4CA;
+        margin-left: 2px;
+        margin-right: 2px;
+        transition: color .3s;
+        -o-transition: color .3s;
+        -ms-transition: color .3s;
+        -moz-transition: color .3s;
+        -webkit-transition: color .3s;
+    }
+    
+    #footer p a:hover {
+        color: #24597F;
+    }
     </style>
+    <script>
+    // 加载echarts
+    require.config({
+        paths: {
+            echarts: "{{url_for('static',filename='js/Echarts')}}"
+        },
+        packages: [{
+            name: 'BMap',
+            location: "{{url_for('static',filename='js/BMap')}}",
+            main: 'main'
+        }]
+    });
+    </script>
 </head>
 
 <body>
     <div id="header">
         <div id="nav">
-            <a href="{{url_for('index')}}" id="nav1"><div>统计</div></a>
-            <a href="" id="nav2"><div>评分</div></a>
-            <a href="" id="nav3"><div>搜索</div></a>
+            <a href="{{url_for('index')}}" id="nav1">
+                统计
+            </a>
+            <a href="{{url_for('rate')}}" id="nav2">
+                评分
+            </a>
+            <a href="{{url_for('search')}}" id="nav3">
+                搜索
+            </a>
         </div>
         <h1>豆瓣电影<span style="font-family:JetLinkMediumOldStamp451548;color:#fff;position:relative;top:-1px;font-size:35px;"><span style="margin-left:10px;margin-right:5px;">数据</span>可视化</span></h1>
         <p>电影原始数据来自<a href="http://movie.douban.com/" target="_blank">豆瓣电影</a>，使用python的<a href="https://docs.python.org/2/library/urllib2.html" target="_blank">urllib2</a>包<span class="em">爬取</span>数据、<a href="http://www.crummy.com/software/BeautifulSoup/bs4/doc/" target="_blank">BeautifulSoup</a>包完成<span class="em">解析</span>，并且进行数据的<span class="em">预处理</span>和<span class="em">清洗</span>。</p>
@@ -112,6 +164,9 @@
     </div>
     <div id="main">
         {% block body %} {% endblock %}
+    </div>
+    <div id="footer">
+        <p>Copyright © 2015 <a href="http://zhanghonglun.cn" target="_blank">张宏伦</a>. All Rights Reserved.</p>
     </div>
 </body>
 

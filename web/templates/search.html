@@ -1,0 +1,199 @@
+{% extends 'layout.html' %} {% block style %}
+<style>
+#search {
+    padding: 50px 80px;
+}
+
+#search #searchForm {
+    position: relative;
+}
+
+#search #searchForm #message {
+    position: absolute;
+    top: 6px;
+    left: 270px;
+    color: #F95555;
+    display: none;
+}
+
+#search #searchForm .input-group {
+    width: 250px;
+}
+
+#search #searchForm #submit {
+    cursor: pointer;
+    transition: color .3s;
+    -o-transition: color .3s;
+    -ms-transition: color .3s;
+    -moz-transition: color .3s;
+    -webkit-transition: color .3s;
+    transition: background-color .3s;
+    -o-transition: background-color .3s;
+    -ms-transition: background-color .3s;
+    -moz-transition: background-color .3s;
+    -webkit-transition: background-color .3s;
+}
+
+#search #searchForm #submit:hover {
+    background-color: #bbb;
+    color: white;
+}
+
+#search #hot,
+#search #searchResult {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#search .movie {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+#search .movie .movie_cover {
+    width: 150px;
+    height: 200px;
+    border-radius: 5px;
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: box-shadow .3s;
+    -o-transition: box-shadow .3s;
+    -ms-transition: box-shadow .3s;
+    -moz-transition: box-shadow .3s;
+    -webkit-transition: box-shadow .3s;
+}
+
+#search .movie .movie_cover:hover {
+    box-shadow: 5px 5px 10px rgba(20, 20, 20, 0.4);
+}
+
+#search .movie .movie_info {
+    margin-left: 170px;
+}
+
+#search .movie .movie_info a {
+    text-decoration: none;
+    color: #6FA4CA;
+    transition: color .3s;
+    -o-transition: color .3s;
+    -ms-transition: color .3s;
+    -moz-transition: color .3s;
+    -webkit-transition: color .3s;
+}
+
+#search .movie .movie_info a:hover {
+    color: #24597F;
+}
+
+#search .movie .movie_info p {
+    color: #555;
+    margin-bottom: 0;
+    font-size: 12px;
+}
+</style>
+{% endblock %} {% block body %}
+<script>
+$(document).ready(function() {
+    $('#header #nav #nav3').addClass('active');
+
+    $('#header #nav a').mouseenter(function() {
+        $('#header #nav a').removeClass('active');
+        $(this).addClass('active');
+    });
+    $('#header #nav').mouseleave(function() {
+        $('#header #nav a').removeClass('active');
+        $('#header #nav #nav3').addClass('active');
+    });
+});
+</script>
+<div id="search">
+    <div class="form-group" id="searchForm">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="输入电影标题">
+            <div class="input-group-addon" id="submit"><i class="fa fa-fw fa-paper-plane-o"></i></div>
+        </div>
+        <p id="message">关键词都不给个怎么搜索……</p>
+    </div>
+    <div id="hot">
+        {% for item in movies %}
+        <div class="movie">
+            <a href="{{item.url}}" target="_blank">
+                <div class="movie_cover" style="background-image:url({{item.cover}})"></div>
+            </a>
+            <div class="movie_info">
+                <h4>
+                    <a href="{{item.url}}" target="_blank">{{item.title}}</a>
+                    <span style="color:#44A031;font-size:14px;margin-left:5px;">
+                        {% if not item.showtime == 0 %}
+                        {{item.showtime}}年
+                        {% endif %}
+                    </span>
+                    <span style="color:#FB5151;font-size:14px;margin-left:5px;">{{item.rate}}分</span>
+                </h4>
+                <p>导演&nbsp;&nbsp;{{item.director}}</p>
+                <p>编剧&nbsp;&nbsp;{{item.composer}}</p>
+                <p>主演&nbsp;&nbsp;{{item.actor}}</p>
+                <p>类型&nbsp;&nbsp;{{item.category}}</p>
+                <p>产地&nbsp;&nbsp;{{item.district}}</p>
+                <p>语言&nbsp;&nbsp;{{item.language}}</p>
+                <p>片长&nbsp;&nbsp;{{item.length}}分钟</p>
+                <p>又名&nbsp;&nbsp;{{item.othername}}</p>
+                <h5 style="color:#555;">剧情简介</h5>
+                <p style="text-indent:2em;color:#777;">
+                    {% for d in item.description %} {{d}}
+                    <br> {% endfor %}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div id="searchResult" style="display:none;">
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('#search #submit').click(function() {
+        var keyword = $('#search input[name="keyword"]').val();
+        if (keyword == '') {
+            $('#search #message').fadeIn();
+            $('#search #hot').show();
+            $('#search #searchResult').hide()
+        } else {
+            $('#search #message').fadeOut();
+            $('#search #hot').hide();
+            $.ajax({
+                url: '{{url_for("keyword")}}',
+                type: 'POST',
+                data: {
+                    keyword: keyword
+                },
+                dataType: 'json',
+                error: function() {},
+                success: function(data) {
+                    $('#search #searchResult').empty();
+                    var  movies = data['movies'];
+                    var temp = '<p style="margin-bottom:20px;">共<span style="color:#2A9662;margin-left:5px;margin-right:5px;">' + movies.length + '</span>条标题含<span style="color:#FF4949;margin-left:5px;margin-right:5px;">' + keyword + '</span>的电影</p>';
+                    $('#search #searchResult').append(temp)
+                    for (var i = 0; i < movies.length; i++) {
+                        var item = '<div class="movie"><a href="' + movies[i]["url"] + '" target="_blank"><div class="movie_cover" style="background-image:url(' + movies[i]["cover"] + ')"></div></a><div class="movie_info"><h4><a href="' + movies[i]["url"] + '" target="_blank">' + movies[i]["title"] + '</a><span style="color:#44A031;font-size:14px;margin-left:5px;">';
+                        if (movies[i]["showtime"] != 0) {
+                            item = item + movies[i]["showtime"] + '年';
+                        }
+                        item = item + '</span><span style="color:#FB5151;font-size:14px;margin-left:5px;">' + movies[i]["rate"] + '分</span></h4><p>导演&nbsp;&nbsp;' + movies[i]["director"] + '</p><p>编剧&nbsp;&nbsp;' + movies[i]["composer"] + '</p><p>主演&nbsp;&nbsp;' + movies[i]["actor"] + '</p><p>类型&nbsp;&nbsp;' + movies[i]["category"] + '</p><p>产地&nbsp;&nbsp;' + movies[i]["district"] + '</p><p>语言&nbsp;&nbsp;' + movies[i]["language"] + '</p><p>片长&nbsp;&nbsp;' + movies[i]["length"] + '分钟</p><p>又名&nbsp;&nbsp;' + movies[i]["othername"] + '</p><h5 style="color:#555;">剧情简介</h5><p style="text-indent:2em;color:#777;">';
+                        for (var j = 0; j < movies[i]['description'].length; j++) {
+                            item = item + movies[i]['description'][j] + '<br/>';
+                        }
+                        item = item + '</p></div></div>';
+                        $('#search #searchResult').append(item);
+                    }
+                    $('#search #searchResult').show();
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

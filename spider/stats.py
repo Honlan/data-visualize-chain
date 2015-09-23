@@ -11,9 +11,16 @@
 import json
 import time
 import random
+import pprint
+import MySQLdb
+import MySQLdb.cursors
 
 inputFile = 'douban_movie_clean.txt'
 fr = open(inputFile, 'r')
+
+db = MySQLdb.connect(host='127.0.0.1', user='root', passwd='root', db='douban', port=8889, charset='utf8', cursorclass = MySQLdb.cursors.DictCursor)
+db.autocommit(True)
+cursor = db.cursor()
 
 firstLine = True
 
@@ -205,7 +212,11 @@ languages = {}
 
 showtimes = {}
 
-lengths = {} 
+lengths = {}
+
+rates = {} 
+
+combined = {}
 
 for line in fr:
 	if firstLine:
@@ -214,6 +225,26 @@ for line in fr:
 
 	line = line.split('^')
 
+	# 统计各个区域各个分类的平均评分
+	category = line[8].split('/')
+	district = line[9].split('/')
+	rate = float(line[4])
+	for d in district:
+		d = d.split('_')[0]
+		if not combined.has_key(d):
+			combined[d] = {}
+		for c in category:
+			if c == '':
+				continue
+			if not combined[d].has_key(c):
+				combined[d][c] = {"average": 0.0, "count": 0.0}
+			combined[d][c]["average"] = (combined[d][c]["average"] * combined[d][c]["count"] + rate) / (combined[d][c]["count"] + 1)
+			combined[d][c]["count"] = combined[d][c]["count"] + 1
+
+	if line[11] == '' or line[12] == '':
+		continue
+
+	# 分类统计
 	category = line[8].split('/')
 	for item in category:
 		if item == '':
@@ -223,13 +254,14 @@ for line in fr:
 		else:
 			categories[item] = categories[item] + 1
 
+	# 区域统计
 	district = line[9].split('/')
 	for item in district:
 		item = item.split('_')[0]
-		for key in nameMap.keys():
-			if nameMap[key] == item:
-				item = key
-				break
+		# for key in nameMap.keys():
+			# if nameMap[key] == item:
+				# item = key
+				# break
 		if item == '':
 			continue
 		if not districts.has_key(item):
@@ -237,6 +269,7 @@ for line in fr:
 		else:
 			districts[item] = districts[item] + 1
 
+	# 语言统计
 	language = line[10].split('/')
 	for item in language:
 		if item == '':
@@ -246,6 +279,7 @@ for line in fr:
 		else:
 			languages[item] = languages[item] + 1
 
+	# 上映时间统计
 	showtime = line[11]
 	if not showtime == '':
 		if not showtimes.has_key(showtime):
@@ -253,6 +287,7 @@ for line in fr:
 		else:
 			showtimes[showtime] = showtimes[showtime] + 1
 
+	# 片长统计
 	length = line[12]
 	if not length == '':
 		if not lengths.has_key(length):
@@ -260,7 +295,36 @@ for line in fr:
 		else:
 			lengths[length] = lengths[length] + 1
 
-for key,value in lengths.items():
-	print key,value
+	# 评分统计
+	rate = line[4]
+	if not rate == '':
+		if not rates.has_key(rate):
+			rates[rate] = 1
+		else:
+			rates[rate] = rates[rate] + 1
+
+# temp = ''
+# categories = sorted(categories.items(), key=lambda x:x[1], reverse=True)
+# for item in categories:
+# 	temp = temp + "'" + item[0] + "',"
+# print temp[:-1]
+
+
+temp = {}
+for key,value in combined.items():
+	temp[key] = {}
+	temp1 = ''
+	temp2 = ''
+	for k,v in value.items():
+		temp1 = temp1 + k + ','
+		temp2 = temp2 + '%.1f' % v['average'] + ','
+	temp[key]['categories'] = temp1[:-1]
+	temp[key]['rates'] = temp2[:-1]
+	cursor.execute("insert into rate(name,categories,rates) values(%s,%s,%s)",[key,temp1[:-1],temp2[:-1]])
+combined = temp
+
+# pprint.pprint(combined)
 
 fr.close()
+db.close()
+cursor.close()
