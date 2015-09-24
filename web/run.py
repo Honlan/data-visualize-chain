@@ -27,8 +27,6 @@ def closedb(db,cursor):
 
 @app.route('/')
 def index():
-	(db,cursor) = connectdb()
-	closedb(db,cursor)
 	return render_template('index.html')
 
 @app.route('/rate')
