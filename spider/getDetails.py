@@ -69,6 +69,7 @@ for line in fr:
 		info = html.select('#info')[0]
 		info = info.get_text().split('\n')
 
+		# 提取字段，只要冒号后面的文本内容
 		director = info[1].split(':')[-1].strip()
 		composer = info[2].split(':')[-1].strip()
 		actor = info[3].split(':')[-1].strip()
@@ -79,9 +80,11 @@ for line in fr:
 		length = info[9].split(':')[-1].strip()
 		othername = info[10].split(':')[-1].strip()
 
+		# 电影简介
 		description = html.find_all("span", attrs={"property": "v:summary"})[0].get_text()
 		description = description.lstrip().lstrip('\n\t').rstrip().rstrip('\n\t').replace('\n','\t')
 
+		# 写入数据
 		record = str(movieId) + '^' + title + '^' + url + '^' + cover + '^' + str(rate) + '^' + director.encode('utf8') + '^' + composer.encode('utf8') + '^' + actor.encode('utf8') + '^' + category.encode('utf8') + '^' + district.encode('utf8') + '^' + language.encode('utf8') + '^' + showtime.encode('utf8') + '^' + length.encode('utf8') + '^' + othername.encode('utf8') + '^' + description.encode('utf8') + '\n'
 		fw.write(record)
 		print count,title
